@@ -2,8 +2,25 @@
 import React from 'react';
 import { BarChart4, DollarSign, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useNavigate } from 'react-router-dom';
 
 const Header = ({ className }: { className?: string }) => {
+  const navigate = useNavigate();
+  
+  const handleInfoClick = () => {
+    document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+  };
+  
+  const handleChartClick = () => {
+    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+  };
+  
   return (
     <header className={cn("w-full py-4 px-6 flex justify-between items-center bg-white/80 backdrop-blur-md border-b z-10", className)}>
       <div className="flex items-center gap-2 text-nexwealth-teal">
@@ -20,12 +37,39 @@ const Header = ({ className }: { className?: string }) => {
       </nav>
       
       <div className="flex items-center gap-4">
-        <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-          <BarChart4 size={20} className="text-nexwealth-blue" />
-        </button>
-        <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-          <Info size={20} className="text-nexwealth-blue" />
-        </button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button 
+                onClick={handleChartClick}
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                aria-label="View financial charts"
+              >
+                <BarChart4 size={20} className="text-nexwealth-blue" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>View financial charts</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button 
+                onClick={handleInfoClick}
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                aria-label="About NexWealth"
+              >
+                <Info size={20} className="text-nexwealth-blue" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>About NexWealth</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     </header>
   );

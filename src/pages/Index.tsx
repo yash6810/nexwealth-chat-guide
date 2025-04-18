@@ -3,10 +3,14 @@ import React from 'react';
 import ChatContainer from '@/components/ChatContainer';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import Header from '@/components/Header';
-import { ArrowRight, BarChart2, Shield, Zap } from 'lucide-react';
+import { ArrowRight, BarChart2, Shield, Zap, Mail, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Index = () => {
+  const handleLearnMoreClick = () => {
+    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Animated background */}
@@ -29,7 +33,7 @@ const Index = () => {
           </p>
           
           {/* Feature highlights */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div id="features" className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <div className="flex items-start gap-3">
               <div className="p-2 bg-nexwealth-teal/10 rounded-lg">
                 <BarChart2 className="text-nexwealth-teal" size={20} />
@@ -71,10 +75,35 @@ const Index = () => {
             </div>
           </div>
           
-          <div className="hidden md:block">
-            <Button className="bg-nexwealth-blue hover:bg-nexwealth-teal text-white px-6 py-2">
+          <div className="hidden md:flex flex-col space-y-6">
+            <Button 
+              onClick={handleLearnMoreClick}
+              className="bg-nexwealth-blue hover:bg-nexwealth-teal text-white px-6 py-2 w-fit"
+            >
               Learn More
             </Button>
+            
+            <div id="about" className="pt-6 border-t">
+              <h2 className="text-2xl font-bold mb-4">About NexWealth</h2>
+              <p className="text-gray-700">
+                NexWealth is your AI-powered financial assistant, designed to help you make better financial decisions. 
+                Our mission is to democratize financial advice through cutting-edge AI technology.
+              </p>
+            </div>
+            
+            <div id="contact" className="pt-6 border-t">
+              <h2 className="text-2xl font-bold mb-4">Contact Us</h2>
+              <div className="flex flex-col space-y-3">
+                <a href="mailto:contact@nexwealth.ai" className="flex items-center gap-2 text-nexwealth-blue hover:text-nexwealth-teal transition-colors">
+                  <Mail size={18} />
+                  <span>contact@nexwealth.ai</span>
+                </a>
+                <a href="tel:+15551234567" className="flex items-center gap-2 text-nexwealth-blue hover:text-nexwealth-teal transition-colors">
+                  <Phone size={18} />
+                  <span>+1 (555) 123-4567</span>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
         
