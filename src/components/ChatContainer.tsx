@@ -6,9 +6,10 @@ import ChatInput from './ChatInput';
 import { Button } from '@/components/ui/button';
 import { Message } from '@/types/chat';
 import { useChat } from '@/hooks/useChat';
+import LanguageSelector from './LanguageSelector';
 
 const ChatContainer: React.FC = () => {
-  const { messages, sendMessage, isLoading } = useChat();
+  const { messages, sendMessage, isLoading, currentLanguage, changeLanguage } = useChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -48,6 +49,10 @@ const ChatContainer: React.FC = () => {
           <p className="text-xs text-gray-500">Ask me anything about personal finance</p>
         </div>
         <div className="flex items-center gap-2">
+          <LanguageSelector 
+            currentLanguage={currentLanguage}
+            onLanguageChange={changeLanguage}
+          />
           {/* Status indicator */}
           <div className="flex items-center">
             <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>

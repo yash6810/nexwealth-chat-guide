@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Message } from '@/types/chat';
 import { generateResponse } from '@/services/chatService';
@@ -6,6 +5,7 @@ import { generateResponse } from '@/services/chatService';
 export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState('en');
   
   // Load chat history from localStorage on initial load
   useEffect(() => {
@@ -36,10 +36,8 @@ export function useChat() {
       timestamp: new Date().toISOString(),
     };
     
-    // Add user message to state
     setMessages(prev => [...prev, userMessage]);
     
-    // Add empty bot message to show typing indicator
     const botMessageId = `bot-${Date.now()}`;
     setMessages(prev => [
       ...prev, 
@@ -51,14 +49,11 @@ export function useChat() {
       }
     ]);
     
-    // Set loading state
     setIsLoading(true);
     
     try {
-      // Get bot response
-      const response = await generateResponse(content, messages);
+      const response = await generateResponse(content, messages, currentLanguage);
       
-      // Update bot message with response
       setMessages(prev => prev.map(msg => 
         msg.id === botMessageId 
           ? { ...msg, content: response } 
@@ -67,7 +62,6 @@ export function useChat() {
     } catch (error) {
       console.error('Error generating response', error);
       
-      // Update bot message with error
       setMessages(prev => prev.map(msg => 
         msg.id === botMessageId 
           ? { ...msg, content: "I'm sorry, I'm having trouble responding right now. Please try again." } 
@@ -83,10 +77,16 @@ export function useChat() {
     localStorage.removeItem('nexwealth-chat');
   };
 
+  const changeLanguage = (language: string) => {
+    setCurrentLanguage(language);
+  };
+
   return {
     messages,
     sendMessage,
     clearChat,
     isLoading,
+    currentLanguage,
+    changeLanguage,
   };
 }
