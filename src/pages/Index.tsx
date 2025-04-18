@@ -1,27 +1,25 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import ChatContainer from '@/components/ChatContainer';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import Header from '@/components/Header';
 import { ArrowRight, BarChart2, Shield, Zap, Mail, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import AboutDialog from '@/components/AboutDialog';
 
 const Index = () => {
+  const [aboutOpen, setAboutOpen] = useState(false);
+  
   const handleLearnMoreClick = () => {
-    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+    setAboutOpen(true);
   };
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Animated background */}
       <AnimatedBackground />
-      
-      {/* Header */}
       <Header />
+      <AboutDialog open={aboutOpen} onOpenChange={setAboutOpen} />
       
-      {/* Hero section */}
       <main className="flex-1 container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-        {/* Left column - Info */}
         <div className="flex flex-col order-2 lg:order-1">
           <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
             Your <span className="bg-gradient-to-r from-nexwealth-blue to-nexwealth-teal bg-clip-text text-transparent">Financial</span> Future,{" "}
@@ -32,7 +30,6 @@ const Index = () => {
             Get personalized financial guidance powered by AI. Ask questions about budgeting, investing, saving, and more to build a stronger financial future.
           </p>
           
-          {/* Feature highlights */}
           <div id="features" className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <div className="flex items-start gap-3">
               <div className="p-2 bg-nexwealth-teal/10 rounded-lg">
@@ -107,7 +104,6 @@ const Index = () => {
           </div>
         </div>
         
-        {/* Right column - Chat */}
         <div className="lg:order-2 w-full h-[600px] order-1">
           <ChatContainer />
         </div>

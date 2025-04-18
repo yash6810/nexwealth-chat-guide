@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BarChart4, DollarSign, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -8,13 +7,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useNavigate } from 'react-router-dom';
 
-const Header = ({ className }: { className?: string }) => {
-  const navigate = useNavigate();
-  
+const Header = ({ className, onAboutClick }: { className?: string, onAboutClick?: () => void }) => {
   const handleInfoClick = () => {
-    document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+    if (onAboutClick) {
+      onAboutClick();
+    }
   };
   
   const handleChartClick = () => {
