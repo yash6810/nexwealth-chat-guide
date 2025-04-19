@@ -47,7 +47,7 @@ const Header = ({ className, onAboutClick }: { className?: string, onAboutClick?
         </nav>
       )}
       
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 mr-8">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -56,7 +56,7 @@ const Header = ({ className, onAboutClick }: { className?: string, onAboutClick?
                 className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 aria-label="View financial charts"
               >
-                <BarChart4 size={20} className="text-nexwealth-blue" />
+                <BarChart4 size={20} className="text-nexwealth-blue dark:text-nexwealth-lightTeal" />
               </button>
             </TooltipTrigger>
             <TooltipContent>
@@ -73,7 +73,7 @@ const Header = ({ className, onAboutClick }: { className?: string, onAboutClick?
                 className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 aria-label="About NexWealth"
               >
-                <Info size={20} className="text-nexwealth-blue" />
+                <Info size={20} className="text-nexwealth-blue dark:text-nexwealth-lightTeal" />
               </button>
             </TooltipTrigger>
             <TooltipContent>

@@ -51,7 +51,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
         <TooltipProvider>
-          <div className="flex items-center justify-end p-2 absolute top-0 right-0 z-20">
+          <div className="fixed top-0 right-0 z-30 p-2">
             <ThemeToggle />
           </div>
           <Toaster />
