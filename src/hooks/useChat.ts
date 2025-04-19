@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Message } from '@/types/chat';
 import { generateResponse } from '@/services/chatService';
+import { conversationContext } from '@/services/contextService';
 
 export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -37,6 +38,7 @@ export function useChat() {
     };
     
     setMessages(prev => [...prev, userMessage]);
+    conversationContext.addToHistory(userMessage);
     
     const botMessageId = `bot-${Date.now()}`;
     setMessages(prev => [
@@ -53,12 +55,17 @@ export function useChat() {
     
     try {
       const response = await generateResponse(content, messages, currentLanguage);
+      const botMessage = {
+        id: botMessageId,
+        content: response,
+        role: 'bot' as const,
+        timestamp: new Date().toISOString()
+      };
       
       setMessages(prev => prev.map(msg => 
-        msg.id === botMessageId 
-          ? { ...msg, content: response } 
-          : msg
+        msg.id === botMessageId ? botMessage : msg
       ));
+      conversationContext.addToHistory(botMessage);
     } catch (error) {
       console.error('Error generating response', error);
       
@@ -75,6 +82,7 @@ export function useChat() {
   const clearChat = () => {
     setMessages([]);
     localStorage.removeItem('nexwealth-chat');
+    conversationContext.clearContext();
   };
 
   const changeLanguage = (language: string) => {

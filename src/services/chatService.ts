@@ -1,5 +1,7 @@
 import { Message } from '@/types/chat';
 import { getLanguageName } from '@/utils/languageUtils';
+import { extractTopics, findMostRelevantTopic } from '@/utils/nlpUtils';
+import { conversationContext } from './contextService';
 
 // Financial terms glossary with translations
 const financialGlossaryMultilingual = {
@@ -131,63 +133,79 @@ const welcomeMessages: Record<string, string> = {
   hi: "नमस्ते! मैं आपका NexWealth वित्तीय सहायक हूं। आज मैं आपकी व्यक्तिगत वित्त में कैसे मदद कर सकता हूं?"
 };
 
-// Generate a chatbot response based on user input and chat history
 export const generateResponse = async (
   userMessage: string, 
   chatHistory: Message[],
   language: string = 'en'
 ): Promise<string> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+  // Add message to context
+  conversationContext.addToHistory({
+    id: `user-${Date.now()}`,
+    content: userMessage,
+    role: 'user',
+    timestamp: new Date().toISOString()
+  });
 
   const message = userMessage.toLowerCase();
+  const extractedTopics = extractTopics(message);
   
-  // Check for specific topics
-  if (message.includes('budget') || message.includes('spending') || message.includes('expense')) {
-    return getRandomAdvice('budgeting');
-  } 
-  else if (message.includes('save') || message.includes('saving') || message.includes('emergency fund')) {
-    return getRandomAdvice('saving');
-  } 
-  else if (message.includes('invest') || message.includes('stock') || message.includes('bond') || 
-           message.includes('etf') || message.includes('fund')) {
-    return getRandomAdvice('investing');
-  } 
-  else if (message.includes('debt') || message.includes('loan') || message.includes('credit card') || 
-           message.includes('mortgage')) {
-    return getRandomAdvice('debt');
-  } 
-  // Check for greetings
+  // Update conversation context with current topics
+  if (extractedTopics.length > 0) {
+    conversationContext.updateContext('currentTopics', extractedTopics);
+  }
+
+  // Process greetings with improved context
   if (message.includes('hello') || message.includes('hi ') || message.includes('hey')) {
+    const lastTopic = conversationContext.getLastUserTopic();
+    if (lastTopic) {
+      return `${welcomeMessages[language] || welcomeMessages.en} I see we were discussing ${lastTopic}. Would you like to continue that conversation?`;
+    }
     return welcomeMessages[language] || welcomeMessages.en;
   }
-  else if (message.includes('thank')) {
-    return "You're welcome! I'm happy to help with any other financial questions you might have.";
+
+  // Improved topic matching with context
+  if (extractedTopics.length > 0) {
+    const mainTopic = findMostRelevantTopic(message, Object.keys(financialAdviceTemplates));
+    if (mainTopic) {
+      const advice = getRandomAdvice(mainTopic as keyof typeof financialAdviceTemplates);
+      conversationContext.updateContext('lastAdviceTopic', mainTopic);
+      return advice;
+    }
   }
-  else if (message.includes('how are you')) {
-    return "I'm doing well, thank you for asking! I'm ready to assist you with any financial questions or concerns you might have.";
-  }
-  
-  // Check for financial terms in the message
+
+  // Check for financial terms with improved matching
   for (const [term, definitionObj] of Object.entries(financialGlossaryMultilingual)) {
-    const definition = definitionObj[language] || definitionObj['en'];
-    if (message.includes(term.toLowerCase())) {
+    const similarity = findMostRelevantTopic(message, [term]);
+    if (similarity) {
+      const definition = definitionObj[language] || definitionObj['en'];
+      const lastTopic = conversationContext.getContext('lastAdviceTopic');
+      
+      if (lastTopic) {
+        return `${term}: ${definition}\n\nThis relates to our previous discussion about ${lastTopic}. Would you like to know more about how they're connected?`;
+      }
       return `${term}: ${definition}\n\nWould you like to know more about how this relates to your financial situation?`;
     }
   }
-  
-  // Add language switch confirmation
+
+  // Add language switch confirmation with context
   if (message.includes('language') || message.includes('idioma') || message.includes('langue')) {
-    return `I've switched to ${getLanguageName(language)}. How can I assist you with your finances?`;
+    const lastTopic = conversationContext.getContext('lastAdviceTopic');
+    const response = `I've switched to ${getLanguageName(language)}.`;
+    return lastTopic 
+      ? `${response} Shall we continue our discussion about ${lastTopic}?`
+      : `${response} How can I assist you with your finances?`;
   }
 
-  // Generic responses for other queries
+  // Improved generic responses based on context
+  const lastTopic = conversationContext.getContext('lastAdviceTopic');
   const genericResponses = [
-    "That's a great question about personal finance. When making financial decisions, it's important to consider your long-term goals and risk tolerance.",
+    lastTopic
+      ? `Building on our discussion about ${lastTopic}, let's explore how this relates to your financial goals.`
+      : "That's a great question about personal finance. When making financial decisions, it's important to consider your long-term goals and risk tolerance.",
     "I'd be happy to discuss that financial topic. Building financial literacy is an important step toward financial independence.",
-    "Financial planning requires a personalized approach. Everyone's situation is unique, but generally, diversification and long-term planning are key strategies.",
-    "Thanks for asking about that. When it comes to personal finance, starting early and being consistent with your habits often leads to the best outcomes.",
-    "That's an important financial question. Remember that financial health involves balancing present needs with future goals while managing risks appropriately."
+    lastTopic
+      ? `While we were discussing ${lastTopic}, this brings up an interesting point about financial planning.`
+      : "Financial planning requires a personalized approach. Everyone's situation is unique, but generally, diversification and long-term planning are key strategies."
   ];
   
   return genericResponses[Math.floor(Math.random() * genericResponses.length)];
