@@ -5,6 +5,7 @@ import { conversationContext } from './contextService';
 import { financialGlossaryMultilingual } from '@/data/financialGlossary';
 import { financialAdviceTemplates, welcomeMessages } from '@/data/responseTemplates';
 import { artificialDelay } from '@/utils/delayUtils';
+import { searchWeb, extractRelevantInfo } from './webBrowsingService';
 
 const translateResponse = async (response: string, targetLanguage: string): Promise<string> => {
   // Here you'd typically integrate with a translation service
@@ -56,10 +57,11 @@ const generateFollowUpQuestion = (topic: string): string => {
 export const generateResponse = async (
   userMessage: string,
   chatHistory: Message[],
-  language: string = 'en'
+  language: string = 'en',
+  useWebSearch: boolean = true
 ): Promise<string> => {
   // Add artificial delay
-  await artificialDelay(2000);
+  await artificialDelay(1000);
 
   const message = userMessage.toLowerCase();
   const extractedTopics = extractTopics(message);
@@ -68,18 +70,40 @@ export const generateResponse = async (
     conversationContext.updateContext('currentTopics', extractedTopics);
   }
 
-  let response: string;
-
   // Handle greetings
   if (message.includes('hello') || message.includes('hi ') || message.includes('hey')) {
     const lastTopic = conversationContext.getLastUserTopic();
-    response = lastTopic 
+    const response = lastTopic 
       ? `${welcomeMessages[language] || welcomeMessages.en} I see we were discussing ${lastTopic}. Would you like to continue that conversation?`
       : welcomeMessages[language] || welcomeMessages.en;
     return await translateResponse(response, language);
   }
 
-  // Handle financial topics
+  let response: string;
+  
+  // Try web search for more comprehensive answers
+  if (useWebSearch && userMessage.length > 5) {
+    try {
+      console.log("Attempting web search for:", userMessage);
+      const searchResults = await searchWeb(userMessage);
+      
+      if (searchResults.length > 0) {
+        const webInfo = await extractRelevantInfo(searchResults, userMessage);
+        
+        // Add a personalized touch to the web search results
+        const personalizedIntro = "Based on the latest information I found online: ";
+        const personalizedOutro = "\n\nI hope this information helps with your financial decisions! Is there anything specific about this topic you'd like to explore further?";
+        
+        response = personalizedIntro + webInfo + personalizedOutro;
+        return await translateResponse(response, language);
+      }
+    } catch (error) {
+      console.error("Error during web search:", error);
+      // If web search fails, fall back to standard responses
+    }
+  }
+
+  // Handle financial topics from our existing knowledge base
   if (extractedTopics.length > 0) {
     const mainTopic = findMostRelevantTopic(message, Object.keys(financialAdviceTemplates));
     if (mainTopic) {

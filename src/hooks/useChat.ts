@@ -1,34 +1,90 @@
+
 import { useState, useEffect } from 'react';
 import { Message } from '@/types/chat';
 import { generateResponse } from '@/services/chatService';
 import { conversationContext } from '@/services/contextService';
 
+export interface Chat {
+  id: string;
+  title: string;
+  messages: Message[];
+  createdAt: string;
+}
+
 export function useChat() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [activeChat, setActiveChat] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState('en');
+  const [useWebSearch, setUseWebSearch] = useState(true);
   
-  // Load chat history from localStorage on initial load
+  // Load chats from localStorage on initial load
   useEffect(() => {
-    const savedMessages = localStorage.getItem('nexwealth-chat');
-    if (savedMessages) {
+    const savedChats = localStorage.getItem('nexwealth-chats');
+    if (savedChats) {
       try {
-        setMessages(JSON.parse(savedMessages));
+        const parsedChats = JSON.parse(savedChats);
+        setChats(parsedChats);
+        
+        // Set most recent chat as active if it exists
+        if (parsedChats.length > 0) {
+          setActiveChat(parsedChats[0].id);
+        }
       } catch (error) {
         console.error('Error loading chat history', error);
       }
+    } else {
+      // Create a new chat if none exists
+      createNewChat();
     }
   }, []);
   
-  // Save chat history to localStorage whenever it changes
+  // Save chats to localStorage whenever they change
   useEffect(() => {
-    if (messages.length > 0) {
-      localStorage.setItem('nexwealth-chat', JSON.stringify(messages));
+    if (chats.length > 0) {
+      localStorage.setItem('nexwealth-chats', JSON.stringify(chats));
     }
-  }, [messages]);
+  }, [chats]);
+  
+  // Get active chat messages
+  const messages = activeChat 
+    ? chats.find(chat => chat.id === activeChat)?.messages || []
+    : [];
+
+  // Create a new chat
+  const createNewChat = () => {
+    const newChatId = `chat-${Date.now()}`;
+    const newChat: Chat = {
+      id: newChatId,
+      title: 'New Conversation',
+      messages: [],
+      createdAt: new Date().toISOString()
+    };
+    
+    setChats(prev => [newChat, ...prev]);
+    setActiveChat(newChatId);
+    conversationContext.clearContext();
+    return newChatId;
+  };
+
+  // Update chat title based on first user message
+  const updateChatTitle = (chatId: string, userMessage: string) => {
+    const title = userMessage.length > 30
+      ? `${userMessage.substring(0, 30)}...`
+      : userMessage;
+      
+    setChats(prev => prev.map(chat => 
+      chat.id === chatId
+        ? { ...chat, title }
+        : chat
+    ));
+  };
 
   const sendMessage = async (content: string) => {
     if (!content.trim()) return;
+    
+    // Create new chat if no active chat
+    const currentChatId = activeChat || createNewChat();
     
     const userMessage: Message = {
       id: `user-${Date.now()}`,
@@ -37,24 +93,45 @@ export function useChat() {
       timestamp: new Date().toISOString(),
     };
     
-    setMessages(prev => [...prev, userMessage]);
+    // Update chat with user message
+    setChats(prev => prev.map(chat => 
+      chat.id === currentChatId
+        ? { 
+            ...chat, 
+            messages: [...chat.messages, userMessage],
+            title: chat.messages.length === 0 ? content : chat.title
+          }
+        : chat
+    ));
+    
     conversationContext.addToHistory(userMessage);
     
     const botMessageId = `bot-${Date.now()}`;
-    setMessages(prev => [
-      ...prev, 
-      {
-        id: botMessageId, 
-        content: '', 
-        role: 'bot', 
-        timestamp: new Date().toISOString()
-      }
-    ]);
+    
+    // Add empty bot message to show loading
+    setChats(prev => prev.map(chat => 
+      chat.id === currentChatId
+        ? { 
+            ...chat, 
+            messages: [...chat.messages, {
+              id: botMessageId, 
+              content: '', 
+              role: 'bot' as const, 
+              timestamp: new Date().toISOString()
+            }]
+          }
+        : chat
+    ));
     
     setIsLoading(true);
     
     try {
-      const response = await generateResponse(content, messages, currentLanguage);
+      // Get current chat messages
+      const currentChat = chats.find(chat => chat.id === currentChatId);
+      const currentMessages = currentChat ? currentChat.messages : [];
+      
+      const response = await generateResponse(content, currentMessages, currentLanguage, useWebSearch);
+      
       const botMessage = {
         id: botMessageId,
         content: response,
@@ -62,39 +139,97 @@ export function useChat() {
         timestamp: new Date().toISOString()
       };
       
-      setMessages(prev => prev.map(msg => 
-        msg.id === botMessageId ? botMessage : msg
+      // Update chat with bot response
+      setChats(prev => prev.map(chat => 
+        chat.id === currentChatId
+          ? { 
+              ...chat, 
+              messages: chat.messages.map(msg => 
+                msg.id === botMessageId ? botMessage : msg
+              )
+            }
+          : chat
       ));
+      
       conversationContext.addToHistory(botMessage);
     } catch (error) {
       console.error('Error generating response', error);
       
-      setMessages(prev => prev.map(msg => 
-        msg.id === botMessageId 
-          ? { ...msg, content: "I'm sorry, I'm having trouble responding right now. Please try again." } 
-          : msg
+      // Update with error message
+      setChats(prev => prev.map(chat => 
+        chat.id === currentChatId
+          ? { 
+              ...chat, 
+              messages: chat.messages.map(msg => 
+                msg.id === botMessageId 
+                  ? { ...msg, content: "I'm sorry, I'm having trouble responding right now. Please try again." } 
+                  : msg
+              )
+            }
+          : chat
       ));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const clearChat = () => {
-    setMessages([]);
-    localStorage.removeItem('nexwealth-chat');
+  const clearChat = (chatId?: string) => {
+    if (chatId) {
+      // Remove specific chat
+      setChats(prev => prev.filter(chat => chat.id !== chatId));
+      
+      // If active chat is deleted, set a new active chat
+      if (activeChat === chatId) {
+        const remainingChats = chats.filter(chat => chat.id !== chatId);
+        setActiveChat(remainingChats.length > 0 ? remainingChats[0].id : null);
+      }
+    } else {
+      // Clear all chats
+      setChats([]);
+      setActiveChat(null);
+    }
+    
     conversationContext.clearContext();
+    localStorage.removeItem('nexwealth-chats');
+  };
+
+  const switchChat = (chatId: string) => {
+    setActiveChat(chatId);
+    // Load chat context when switching
+    const chat = chats.find(c => c.id === chatId);
+    if (chat) {
+      // Reset context and add last few messages to context
+      conversationContext.clearContext();
+      const lastMessages = chat.messages.slice(-5);
+      lastMessages.forEach(msg => conversationContext.addToHistory(msg));
+    }
+  };
+
+  const deleteChat = (chatId: string) => {
+    clearChat(chatId);
   };
 
   const changeLanguage = (language: string) => {
     setCurrentLanguage(language);
   };
+  
+  const toggleWebSearch = (enabled: boolean) => {
+    setUseWebSearch(enabled);
+  };
 
   return {
     messages,
+    chats,
+    activeChat,
     sendMessage,
     clearChat,
+    createNewChat,
+    switchChat,
+    deleteChat,
     isLoading,
     currentLanguage,
     changeLanguage,
+    useWebSearch,
+    toggleWebSearch
   };
 }
