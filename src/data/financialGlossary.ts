@@ -94,5 +94,37 @@ export const financialGlossaryMultilingual: { [key: string]: FinancialTerm } = {
     de: "Jährlicher Prozentsatz - der jährliche Zinssatz für die Kreditaufnahme, ausgedrückt als Prozentsatz.",
     zh: "年度百分比 - 借款收取的年度利率，以百分比表示。",
     hi: "वार्षिक प्रतिशत दर - उधार के लिए लिया जाने वाला वार्षिक दर, जिसे प्रतिशत के रूप में व्यक्त किया जाता है।"
+  },
+  "Asset Allocation": {
+    en: "The strategy of dividing your investment portfolio among different asset categories like stocks, bonds, and cash to balance risk and reward.",
+    es: "La estrategia de dividir su cartera de inversiones entre diferentes categorías de activos como acciones, bonos y efectivo para equilibrar el riesgo y la recompensa.",
+    fr: "La stratégie consistant à répartir votre portefeuille d'investissement entre différentes catégories d'actifs comme les actions, les obligations et les liquidités pour équilibrer risque et rendement.",
+    de: "Die Strategie, Ihr Anlageportfolio zwischen verschiedenen Anlagekategorien wie Aktien, Anleihen und Bargeld aufzuteilen, um Risiko und Ertrag auszugleichen.",
+    zh: "在不同资产类别（如股票、债券和现金）之间分配投资组合的策略，以平衡风险和回报。",
+    hi: "जोखिम और पुरस्कार को संतुलित करने के लिए अपने निवेश पोर्टफोलियो को स्टॉक, बॉन्ड और नकदी जैसी विभिन्न परिसंपत्ति श्रेणियों में विभाजित करने की रणनीति।"
+  },
+  "Risk Tolerance": {
+    en: "Your ability and willingness to lose some or all of your investment in exchange for greater potential returns.",
+    es: "Su capacidad y disposición para perder parte o la totalidad de su inversión a cambio de un mayor potencial de rendimiento.",
+    fr: "Votre capacité et votre volonté de perdre une partie ou la totalité de votre investissement en échange d'un potentiel de rendement plus élevé.",
+    de: "Ihre Fähigkeit und Bereitschaft, einen Teil oder die Gesamtheit Ihrer Anlage im Austausch für höhere potenzielle Renditen zu verlieren.",
+    zh: "您为了获得更大的潜在回报而愿意损失部分或全部投资的能力和意愿。",
+    hi: "अधिक संभावित रिटर्न के बदले में अपने निवेश का कुछ या सभी खोने की आपकी क्षमता और इच्छा।"
+  },
+  "Emergency Fund": {
+    en: "Money set aside to cover unexpected expenses or financial emergencies, typically 3-6 months of living expenses.",
+    es: "Dinero reservado para cubrir gastos inesperados o emergencias financieras, típicamente 3-6 meses de gastos de vida.",
+    fr: "Argent mis de côté pour couvrir les dépenses imprévues ou les urgences financières, généralement 3 à 6 mois de dépenses courantes.",
+    de: "Geld, das für unerwartete Ausgaben oder finanzielle Notfälle zurückgelegt wird, typischerweise 3-6 Monate Lebenshaltungskosten.",
+    zh: "为了应对意外支出或财务紧急情况而预留的资金，通常为3-6个月的生活费用。",
+    hi: "अप्रत्याशित खर्चों या वित्तीय आपात स्थितियों को कवर करने के लिए अलग रखा गया धन, आमतौर पर 3-6 महीने का जीवन यापन खर्च।"
+  },
+  "Compound Interest": {
+    en: "Interest earned on both the initial principal and the accumulated interest from previous periods. Einstein called it the 'eighth wonder of the world'!",
+    es: "Interés ganado tanto sobre el capital inicial como sobre los intereses acumulados de períodos anteriores. ¡Einstein lo llamó la 'octava maravilla del mundo'!",
+    fr: "Intérêts gagnés à la fois sur le principal initial et sur les intérêts accumulés des périodes précédentes. Einstein l'appelait la 'huitième merveille du monde' !",
+    de: "Zinsen, die sowohl auf das ursprüngliche Kapital als auch auf die aufgelaufenen Zinsen aus früheren Perioden anfallen. Einstein nannte es das 'achte Weltwunder'!",
+    zh: "在初始本金和以前期间累积的利息上赚取的利息。爱因斯坦称之为'世界第八大奇迹'！",
+    hi: "प्रारंभिक मूलधन और पिछली अवधियों के संचित ब्याज दोनों पर अर्जित ब्याज। आइंस्टीन ने इसे 'दुनिया का आठवां आश्चर्य' कहा!"
   }
 };
