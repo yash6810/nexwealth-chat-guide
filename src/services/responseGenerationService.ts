@@ -4,6 +4,16 @@ import { extractTopics, findMostRelevantTopic } from '@/utils/nlpUtils';
 import { conversationContext } from './contextService';
 import { financialGlossaryMultilingual } from '@/data/financialGlossary';
 import { financialAdviceTemplates, welcomeMessages } from '@/data/responseTemplates';
+import { artificialDelay } from '@/utils/delayUtils';
+
+const translateResponse = async (response: string, targetLanguage: string): Promise<string> => {
+  // Here you'd typically integrate with a translation service
+  // For now, we'll use a simple mock translation
+  if (targetLanguage === 'en') return response;
+  
+  // This is a placeholder. In a real app, you'd integrate with a translation API
+  return `${response} (Translated to ${targetLanguage})`;
+};
 
 const getRandomAdvice = (category: keyof typeof financialAdviceTemplates): string => {
   const advice = financialAdviceTemplates[category];
@@ -48,6 +58,9 @@ export const generateResponse = async (
   chatHistory: Message[],
   language: string = 'en'
 ): Promise<string> => {
+  // Add artificial delay
+  await artificialDelay(2000);
+
   const message = userMessage.toLowerCase();
   const extractedTopics = extractTopics(message);
   
@@ -55,13 +68,15 @@ export const generateResponse = async (
     conversationContext.updateContext('currentTopics', extractedTopics);
   }
 
+  let response: string;
+
   // Handle greetings
   if (message.includes('hello') || message.includes('hi ') || message.includes('hey')) {
     const lastTopic = conversationContext.getLastUserTopic();
-    if (lastTopic) {
-      return `${welcomeMessages[language] || welcomeMessages.en} I see we were discussing ${lastTopic}. Would you like to continue that conversation?`;
-    }
-    return welcomeMessages[language] || welcomeMessages.en;
+    response = lastTopic 
+      ? `${welcomeMessages[language] || welcomeMessages.en} I see we were discussing ${lastTopic}. Would you like to continue that conversation?`
+      : welcomeMessages[language] || welcomeMessages.en;
+    return await translateResponse(response, language);
   }
 
   // Handle financial topics
@@ -70,7 +85,8 @@ export const generateResponse = async (
     if (mainTopic) {
       const advice = getRandomAdvice(mainTopic as keyof typeof financialAdviceTemplates);
       conversationContext.updateContext('lastAdviceTopic', mainTopic);
-      return `${advice}\n\n${generateFollowUpQuestion(mainTopic)}`;
+      response = `${advice}\n\n${generateFollowUpQuestion(mainTopic)}`;
+      return await translateResponse(response, language);
     }
   }
 
@@ -81,10 +97,11 @@ export const generateResponse = async (
       const definition = definitionObj[language] || definitionObj['en'];
       const lastTopic = conversationContext.getContext('lastAdviceTopic');
       
-      if (lastTopic) {
-        return `${term}: ${definition}\n\nThis relates to our previous discussion about ${lastTopic}. Would you like to know more about how they're connected?\n\nI can provide specific examples or practical applications if you're interested.`;
-      }
-      return `${term}: ${definition}\n\nWould you like to know more about how this relates to your financial situation? I can provide practical examples and tips for applying this knowledge.`;
+      response = lastTopic
+        ? `${term}: ${definition}\n\nThis relates to our previous discussion about ${lastTopic}. Would you like to know more about how they're connected?\n\nI can provide specific examples or practical applications if you're interested.`
+        : `${term}: ${definition}\n\nWould you like to know more about how this relates to your financial situation? I can provide practical examples and tips for applying this knowledge.`;
+      
+      return await translateResponse(response, language);
     }
   }
 
@@ -100,5 +117,6 @@ export const generateResponse = async (
       : "Financial planning is very personal, and I want to make sure I provide relevant advice. Could you tell me more about your specific interests or concerns?"
   ];
   
-  return genericResponses[Math.floor(Math.random() * genericResponses.length)];
+  response = genericResponses[Math.floor(Math.random() * genericResponses.length)];
+  return await translateResponse(response, language);
 };
