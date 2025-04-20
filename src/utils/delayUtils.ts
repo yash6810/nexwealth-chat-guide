@@ -1,4 +1,4 @@
 
-export const artificialDelay = (ms: number = 1000): Promise<void> => {
+export const artificialDelay = (ms: number = 2000): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };

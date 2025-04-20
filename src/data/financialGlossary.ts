@@ -1,3 +1,4 @@
+
 interface GlossaryEntry {
   [key: string]: string;
 }
@@ -79,7 +80,7 @@ export const financialGlossaryMultilingual: { [key: string]: FinancialTerm } = {
     zh: "一种投资策略，无论资产价格如何，您都可以定期投资固定金额。",
     hi: "एक निवेश रणनीति जहां आप परिसंपत्ति की कीमत की परवाह किए बिना, नियमित रूप से एक निश्चित राशि का निवेश करते हैं।"
   },
-  "Emergency Fund": {
+  "Emergency Fund Basic": {
     en: "Money set aside for unexpected expenses or financial emergencies, typically 3-6 months of living expenses.",
     es: "Dinero reservado para gastos inesperados o emergencias financieras, generalmente de 3 a 6 meses de gastos de manutención.",
     fr: "Argent mis de côté pour les dépenses imprévues ou les urgences financières, généralement 3 à 6 mois de frais de subsistance.",
@@ -111,15 +112,7 @@ export const financialGlossaryMultilingual: { [key: string]: FinancialTerm } = {
     zh: "您为了获得更大的潜在回报而愿意损失部分或全部投资的能力和意愿。",
     hi: "अधिक संभावित रिटर्न के बदले में अपने निवेश का कुछ या सभी खोने की आपकी क्षमता और इच्छा।"
   },
-  "Emergency Fund": {
-    en: "Money set aside to cover unexpected expenses or financial emergencies, typically 3-6 months of living expenses.",
-    es: "Dinero reservado para cubrir gastos inesperados o emergencias financieras, típicamente 3-6 meses de gastos de vida.",
-    fr: "Argent mis de côté pour couvrir les dépenses imprévues ou les urgences financières, généralement 3 à 6 mois de dépenses courantes.",
-    de: "Geld, das für unerwartete Ausgaben oder finanzielle Notfälle zurückgelegt wird, typischerweise 3-6 Monate Lebenshaltungskosten.",
-    zh: "为了应对意外支出或财务紧急情况而预留的资金，通常为3-6个月的生活费用。",
-    hi: "अप्रत्याशित खर्चों या वित्तीय आपात स्थितियों को कवर करने के लिए अलग रखा गया धन, आमतौर पर 3-6 महीने का जीवन यापन खर्च।"
-  },
-  "Compound Interest": {
+  "Compound Growth": {
     en: "Interest earned on both the initial principal and the accumulated interest from previous periods. Einstein called it the 'eighth wonder of the world'!",
     es: "Interés ganado tanto sobre el capital inicial como sobre los intereses acumulados de períodos anteriores. ¡Einstein lo llamó la 'octava maravilla del mundo'!",
     fr: "Intérêts gagnés à la fois sur le principal initial et sur les intérêts accumulés des périodes précédentes. Einstein l'appelait la 'huitième merveille du monde' !",
