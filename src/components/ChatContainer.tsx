@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowDown, Plus, Globe, Settings } from 'lucide-react';
 import ChatMessage from './ChatMessage';
@@ -116,7 +115,6 @@ const ChatContainer: React.FC = () => {
                   <Switch 
                     checked={useWebSearch}
                     onCheckedChange={toggleWebSearch}
-                    size="sm"
                   />
                 </div>
               </TooltipTrigger>
