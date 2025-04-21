@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Message } from '@/types/chat';
 import { generateResponse } from '@/services/chatService';
@@ -18,7 +17,6 @@ export function useChat() {
   const [currentLanguage, setCurrentLanguage] = useState('en');
   const [useWebSearch, setUseWebSearch] = useState(true);
   
-  // Load chats from localStorage on initial load
   useEffect(() => {
     const savedChats = localStorage.getItem('nexwealth-chats');
     if (savedChats) {
@@ -26,7 +24,6 @@ export function useChat() {
         const parsedChats = JSON.parse(savedChats);
         setChats(parsedChats);
         
-        // Set most recent chat as active if it exists
         if (parsedChats.length > 0) {
           setActiveChat(parsedChats[0].id);
         }
@@ -34,24 +31,20 @@ export function useChat() {
         console.error('Error loading chat history', error);
       }
     } else {
-      // Create a new chat if none exists
       createNewChat();
     }
   }, []);
   
-  // Save chats to localStorage whenever they change
   useEffect(() => {
     if (chats.length > 0) {
       localStorage.setItem('nexwealth-chats', JSON.stringify(chats));
     }
   }, [chats]);
   
-  // Get active chat messages
   const messages = activeChat 
     ? chats.find(chat => chat.id === activeChat)?.messages || []
     : [];
 
-  // Create a new chat
   const createNewChat = () => {
     const newChatId = `chat-${Date.now()}`;
     const newChat: Chat = {
@@ -67,7 +60,6 @@ export function useChat() {
     return newChatId;
   };
 
-  // Update chat title based on first user message
   const updateChatTitle = (chatId: string, userMessage: string) => {
     const title = userMessage.length > 30
       ? `${userMessage.substring(0, 30)}...`
@@ -83,7 +75,6 @@ export function useChat() {
   const sendMessage = async (content: string) => {
     if (!content.trim()) return;
     
-    // Create new chat if no active chat
     const currentChatId = activeChat || createNewChat();
     
     const userMessage: Message = {
@@ -93,7 +84,6 @@ export function useChat() {
       timestamp: new Date().toISOString(),
     };
     
-    // Update chat with user message
     setChats(prev => prev.map(chat => 
       chat.id === currentChatId
         ? { 
@@ -108,7 +98,6 @@ export function useChat() {
     
     const botMessageId = `bot-${Date.now()}`;
     
-    // Add empty bot message to show loading
     setChats(prev => prev.map(chat => 
       chat.id === currentChatId
         ? { 
@@ -126,11 +115,15 @@ export function useChat() {
     setIsLoading(true);
     
     try {
-      // Get current chat messages
       const currentChat = chats.find(chat => chat.id === currentChatId);
       const currentMessages = currentChat ? currentChat.messages : [];
       
-      const response = await generateResponse(content, currentMessages, currentLanguage, useWebSearch);
+      const response = await generateResponse(
+        content, 
+        currentMessages, 
+        currentLanguage, 
+        useWebSearch
+      );
       
       const botMessage = {
         id: botMessageId,
@@ -139,7 +132,6 @@ export function useChat() {
         timestamp: new Date().toISOString()
       };
       
-      // Update chat with bot response
       setChats(prev => prev.map(chat => 
         chat.id === currentChatId
           ? { 
@@ -155,7 +147,6 @@ export function useChat() {
     } catch (error) {
       console.error('Error generating response', error);
       
-      // Update with error message
       setChats(prev => prev.map(chat => 
         chat.id === currentChatId
           ? { 
@@ -175,16 +166,13 @@ export function useChat() {
 
   const clearChat = (chatId?: string) => {
     if (chatId) {
-      // Remove specific chat
       setChats(prev => prev.filter(chat => chat.id !== chatId));
       
-      // If active chat is deleted, set a new active chat
       if (activeChat === chatId) {
         const remainingChats = chats.filter(chat => chat.id !== chatId);
         setActiveChat(remainingChats.length > 0 ? remainingChats[0].id : null);
       }
     } else {
-      // Clear all chats
       setChats([]);
       setActiveChat(null);
     }
@@ -195,10 +183,8 @@ export function useChat() {
 
   const switchChat = (chatId: string) => {
     setActiveChat(chatId);
-    // Load chat context when switching
     const chat = chats.find(c => c.id === chatId);
     if (chat) {
-      // Reset context and add last few messages to context
       conversationContext.clearContext();
       const lastMessages = chat.messages.slice(-5);
       lastMessages.forEach(msg => conversationContext.addToHistory(msg));
