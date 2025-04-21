@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowDown, Plus, Globe, Settings } from 'lucide-react';
 import ChatMessage from './ChatMessage';
@@ -148,24 +149,24 @@ const ChatContainer: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              </div>
-              <p className="text-xl font-medium mb-2 text-nexwealth-blue">Welcome to NexWealth!</p>
-              <p className="text-gray-500 max-w-md text-center mb-8">Your AI financial assistant with web browsing capabilities. Ask me about investing, saving, budgeting, or any personal finance questions you have.</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                {[
-                  "How do I create a budget?",
-                  "What's the difference between a Roth and Traditional IRA?",
-                  "How much should I save for retirement?",
-                  "What's the 50/30/20 rule?"
-                ].map((q, i) => (
-                  <button 
-                    key={i}
-                    onClick={() => sendMessage(q)}
-                    className="bg-white p-2 rounded-md border border-gray-200 text-left hover:bg-gray-50 transition"
-                  >
-                    {q}
-                  </button>
-                ))}
+                <p className="text-xl font-medium mb-2 text-nexwealth-blue">Welcome to NexWealth!</p>
+                <p className="text-gray-500 max-w-md text-center mb-8">Your AI financial assistant with web browsing capabilities. Ask me about investing, saving, budgeting, or any personal finance questions you have.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                  {[
+                    "How do I create a budget?",
+                    "What's the difference between a Roth and Traditional IRA?",
+                    "How much should I save for retirement?",
+                    "What's the 50/30/20 rule?"
+                  ].map((q, i) => (
+                    <button 
+                      key={i}
+                      onClick={() => sendMessage(q)}
+                      className="bg-white p-2 rounded-md border border-gray-200 text-left hover:bg-gray-50 transition"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : (
               <>
